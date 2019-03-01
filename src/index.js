@@ -1,7 +1,7 @@
 import Fingerprint2 from 'fingerprintjs2';
 import 'babel-polyfill';
 
-let fingerprintReport = async function () {
+let fingerprintReport = async function (params) {
     return new Promise((resolve, reject) => {
         Fingerprint2.get({
             excludes: {                             // 排除的参数
@@ -16,16 +16,23 @@ let fingerprintReport = async function () {
             }
         }, function (components) {
             let murmur = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value }).join(), 31)
-            resolve(murmur);
+            let obj = {};
+
+            obj.fp = murmur;
+            if(params === 'details') {
+                obj.components = components;
+            }
+            resolve(obj);
         })
     })
 }
 
 export default {
-    get: function () {
-        return fingerprintReport();
+    get: function (params) {
+        return fingerprintReport(params);
     },
-    init: async function () {
+    init: async function (params) {
+
         // 在初始页面加载时使用，避免生成不同指纹
         await new Promise((resolve) => {
             if (window.requestIdleCallback) {
@@ -34,6 +41,6 @@ export default {
                 setTimeout(resolve, 500);
             }
         })
-        return fingerprintReport();
+        return fingerprintReport(params);
     }
 }

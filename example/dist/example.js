@@ -1573,7 +1573,7 @@
     return store[key] || (store[key] = value !== undefined ? value : {});
   })('versions', []).push({
     version: _core.version,
-    mode: _library ? 'pure' : 'global',
+    mode: 'global',
     copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
   });
   });
@@ -1767,7 +1767,7 @@
 
   var defineProperty = _objectDp.f;
   var _wksDefine = function (name) {
-    var $Symbol = _core.Symbol || (_core.Symbol = _library ? {} : _global.Symbol || {});
+    var $Symbol = _core.Symbol || (_core.Symbol = _global.Symbol || {});
     if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: _wksExt.f(name) });
   };
 
@@ -8474,7 +8474,7 @@
   function () {
     var _ref = _asyncToGenerator(
     /*#__PURE__*/
-    regeneratorRuntime.mark(function _callee() {
+    regeneratorRuntime.mark(function _callee(params) {
       return regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -8504,7 +8504,14 @@
                   var murmur = fingerprint2.x64hash128(components.map(function (pair) {
                     return pair.value;
                   }).join(), 31);
-                  resolve(murmur);
+                  var obj = {};
+                  obj.fp = murmur;
+
+                  if (params === 'details') {
+                    obj.components = components;
+                  }
+
+                  resolve(obj);
                 });
               }));
 
@@ -8516,19 +8523,19 @@
       }, _callee);
     }));
 
-    return function fingerprintReport() {
+    return function fingerprintReport(_x) {
       return _ref.apply(this, arguments);
     };
   }();
 
   var bundle = {
-    get: function get() {
-      return fingerprintReport();
+    get: function get(params) {
+      return fingerprintReport(params);
     },
     init: function () {
       var _init = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee2() {
+      regeneratorRuntime.mark(function _callee2(params) {
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -8543,7 +8550,7 @@
                 });
 
               case 2:
-                return _context2.abrupt("return", fingerprintReport());
+                return _context2.abrupt("return", fingerprintReport(params));
 
               case 3:
               case "end":
@@ -8553,7 +8560,7 @@
         }, _callee2);
       }));
 
-      function init() {
+      function init(_x2) {
         return _init.apply(this, arguments);
       }
 
@@ -8562,7 +8569,9 @@
   };
 
   window.onload = function () {
-    console.log('-------------', bundle);
+    bundle.init('details').then(function (v) {
+      console.log(v);
+    });
   };
 
 }));
